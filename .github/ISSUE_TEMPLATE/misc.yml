@@ -1,0 +1,14 @@
+---
+name: "🧹 そのほか作業"
+description: "workflowの修正や雑多な作業"
+title: "[chore]"
+labels: []
+assignees: []
+body:
+  - type: textarea
+    id: overview-description
+    attributes:
+      label: "概要"
+      description: "何をするか記載ください"
+    validations:
+      required: true

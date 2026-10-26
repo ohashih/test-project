@@ -1,0 +1,6 @@
+*    @ohashih
+
+# Protected paths - require explicit admin review
+/bootstrap/              @ohashih
+/infra/                  @ohashih
+project_statements.json  @ohashih

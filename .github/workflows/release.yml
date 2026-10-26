@@ -1,0 +1,18 @@
+---
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    uses: aucnet-dev/rent-a-workflow/.github/workflows/release-reusable.yml@main
+    permissions:
+      contents: write
+      pull-requests: write
+    secrets: inherit

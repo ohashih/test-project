@@ -1,0 +1,30 @@
+---
+name: 🚀 新規リソース追加・変更依頼
+description: 新しいインフラリソースの作成や、既存リソースの構成変更
+title: "[feat]"
+labels: []
+assignees: []
+body:
+  - type: textarea
+    id: overview-description
+    attributes:
+      label: 概要
+      description: 何をしたいか、簡潔に記述してください
+      placeholder: |
+        - 本番環境のAuroraインスタンスのスケールアップ
+    validations:
+      required: true
+  - type: textarea
+    id: purpose-description
+    attributes:
+      label: 背景/目的
+      description: なぜこの変更が必要なのか記載してください
+    validations:
+      required: true
+  - type: textarea
+    id: remarks-description
+    attributes:
+      label: 備考
+      description: 備考
+    validations:
+      required: false

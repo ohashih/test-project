@@ -1,0 +1,16 @@
+---
+name: 🦟 不具合の修正
+description: 不具合の修正
+title: "[fix]"
+labels: ["fix"]
+assignees: []
+body:
+  - type: textarea
+    id: overview-description
+    attributes:
+      label: 概要
+      description: 何のために何を修正するか記載ください
+      placeholder: |
+        - checkovのskipコメントの修正
+    validations:
+      required: true

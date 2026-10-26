@@ -1,0 +1,17 @@
+---
+name: Lint
+
+on: [pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    uses: aucnet-dev/rent-a-workflow/.github/workflows/lint-reusable.yml@main
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: read
+      statuses: write
+    secrets: inherit

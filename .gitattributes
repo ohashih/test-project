@@ -1,0 +1,16 @@
+# Download as auto
+* text=auto
+
+# Save as LF
+*.sh      text eol=lf
+*.bash    text eol=lf
+dockerfile text eol=lf
+*.yaml    text eol=lf
+*.yml     text eol=lf
+*.json    text eol=lf
+
+# Handle as binary
+*.jpg     binary
+*.png     binary
+*.gif     binary
+*.pdf     binary

@@ -1,0 +1,33 @@
+# Linter
+tmp
+super-linter.log
+
+# Node.js
+node_modules
+
+# Astro
+dist
+
+# Terraform
+.terraform
+!.terraform.lock.hcl
+*.hide
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup
+*.tfvars
+!*.tfvars.example
+app/backend_config/*.hcl
+infra/backend_config/*.hcl
+bootstrap/terraform.tfvars
+bootstrap/backend.hcl
+bootstrap/config.yml
+project_statements.json
+
+# macOS
+.DS_Store
+.Trashes
+.Spotlight-V100
+
+# Claude
+**/.claude

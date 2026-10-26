@@ -1,0 +1,13 @@
+---
+name: Check PR Source Branch
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check-source:
+    uses: aucnet-dev/rent-a-workflow/.github/workflows/restrict-pull-request-reusable.yml@main

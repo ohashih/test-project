@@ -1,0 +1,66 @@
+---
+name: Resolve Environment (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      branch_ref:
+        description: "Branch name to resolve environment from (e.g. github.base_ref or github.ref_name)"
+        required: true
+        type: string
+    outputs:
+      environment:
+        description: "Resolved environment name"
+        value: ${{ jobs.resolve.outputs.environment }}
+      workspace:
+        description: "Resolved workspace name"
+        value: ${{ jobs.resolve.outputs.workspace }}
+      skip:
+        description: "Whether to skip subsequent jobs (true if template repo or unmapped branch)"
+        value: ${{ jobs.resolve.outputs.skip }}
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    name: Resolve Environment
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      environment: ${{ steps.resolve.outputs.environment }}
+      workspace: ${{ steps.resolve.outputs.workspace }}
+      skip: ${{ steps.resolve.outputs.skip }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Resolve environment from project_statements.json
+        id: resolve
+        env:
+          BRANCH: ${{ inputs.branch_ref }}
+        run: |
+          if [[ ! -f project_statements.json ]]; then
+            echo "project_statements.json not found. This is a template repository. Skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          ENV_ENTRY=$(jq -r --arg branch "$BRANCH" \
+            '.environments[] | select(.branch == $branch)' project_statements.json)
+
+          if [[ -z "$ENV_ENTRY" ]]; then
+            echo "Branch '$BRANCH' is not mapped to any environment. Skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          ENV_NAME=$(echo "$ENV_ENTRY" | jq -r '.name')
+          WORKSPACE=$(echo "$ENV_ENTRY" | jq -r '.workspace')
+
+          {
+            echo "environment=$ENV_NAME"
+            echo "workspace=$WORKSPACE"
+            echo "skip=false"
+          } >> "$GITHUB_OUTPUT"
+          echo "Resolved: branch=$BRANCH environment=$ENV_NAME workspace=$WORKSPACE"
