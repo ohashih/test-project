@@ -6,8 +6,63 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   check-source:
-    uses: aucnet-dev/rent-a-workflow/.github/workflows/restrict-pull-request-reusable.yml@main
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Check project_statements.json exists
+        id: check
+        run: |
+          if [[ ! -f project_statements.json ]]; then
+            echo "project_statements.json not found. Skipping (template repo)."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate source branch
+        if: steps.check.outputs.skip != 'true'
+        env:
+          SOURCE_BRANCH: ${{ github.head_ref }}
+          TARGET_BRANCH: ${{ github.base_ref }}
+        run: |
+          echo "Checking PR: $SOURCE_BRANCH -> $TARGET_BRANCH"
+
+          # Read environments from project_statements.json (ordered: prod -> stg -> dev)
+          ENVS=$(jq -c '.environments' project_statements.json)
+          ENV_COUNT=$(echo "$ENVS" | jq 'length')
+
+          # Find the index of the target branch in the environments array
+          TARGET_INDEX=$(echo "$ENVS" | jq -r --arg branch "$TARGET_BRANCH" \
+            'to_entries[] | select(.value.branch == $branch) | .key')
+
+          if [[ -z "$TARGET_INDEX" ]]; then
+            echo "Target branch '$TARGET_BRANCH' is not a managed environment branch. Skipping check."
+            exit 0
+          fi
+
+          LAST_INDEX=$((ENV_COUNT - 1))
+
+          # If target is the lowest environment branch, allow any source
+          if [[ "$TARGET_INDEX" -eq "$LAST_INDEX" ]]; then
+            echo "Target '$TARGET_BRANCH' is the lowest environment branch. Any source is allowed."
+            exit 0
+          fi
+
+          # Otherwise, only allow the next-lower environment's branch or hotfix/*
+          ALLOWED_BRANCH=$(echo "$ENVS" | jq -r --argjson idx "$((TARGET_INDEX + 1))" '.[$idx].branch')
+
+          if [[ "$SOURCE_BRANCH" == "$ALLOWED_BRANCH" || "$SOURCE_BRANCH" == hotfix/* ]]; then
+            echo "Source branch '$SOURCE_BRANCH' is allowed for '$TARGET_BRANCH'."
+          else
+            echo "Error: Pull requests to '$TARGET_BRANCH' are only allowed from '$ALLOWED_BRANCH' or 'hotfix/*' branches."
+            exit 1
+          fi
