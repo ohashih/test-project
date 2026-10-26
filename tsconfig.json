@@ -18,6 +18,6 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true
   },
-  "include": ["**/*.ts"],
+  "include": [],
   "exclude": ["node_modules", "dist", "cdk.out", "coverage", "tmp"]
 }

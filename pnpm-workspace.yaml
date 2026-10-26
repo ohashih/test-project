@@ -1,0 +1,5 @@
+packages:
+  - lambda
+  - frontend
+allowBuilds:
+  esbuild: true

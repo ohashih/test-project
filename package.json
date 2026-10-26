@@ -7,7 +7,8 @@
     "prepare": "bash -c 'cp ./git_hooks/* ./.git/hooks/'",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "typecheck": "tsc"
+    "typecheck": "pnpm -r typecheck",
+    "build": "pnpm -r build"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,7 @@
   "homepage": "https://github.com/kurage/docs-infra#readme",
   "private": true,
   "devDependencies": {
-    "@biomejs/biome": "2.5.14",
+    "@biomejs/biome": "2.6.3",
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@types/aws-lambda": "^8.10.164",
