@@ -1,17 +1,50 @@
 ---
-name: Lint
+name: Lint (Reusable)
 
-on: [pull_request]
+on:
+  workflow_call:
 
 permissions:
   contents: read
 
 jobs:
-  lint:
-    uses: aucnet-dev/rent-a-workflow/.github/workflows/lint-reusable.yml@main
+  commitlint:
+    permissions:
+      contents: read
+      pull-requests: read
+    name: Lint Commit Message
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed # v6.2.1
+
+  super-linter:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       packages: read
-      pull-requests: read
       statuses: write
-    secrets: inherit
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Load environment variables
+        run: |
+          if [[ -f .github/super-linter.env ]]; then
+            cat .github/super-linter.env >> "$GITHUB_ENV"
+          fi
+      - name: Run super-linter
+        uses: super-linter/super-linter/slim@2da136927bd4a73596db63044b504547c62cb854 # v9.0.0
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINTER_RULES_PATH: ./
+          VALIDATE_ALL_CODEBASE: false
